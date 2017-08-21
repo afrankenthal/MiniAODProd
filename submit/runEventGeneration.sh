@@ -4,6 +4,8 @@
 # setup
 export BASEDIR=`pwd`
 
+echo "base area"
+ls -lhrt
 
 ############
 # inputs
@@ -11,6 +13,8 @@ export BASEDIR=`pwd`
 export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch
 source $VO_CMS_SW_DIR/cmsset_default.sh
 source inputs.sh
+
+export nevent="500"
 
 #
 #############
@@ -33,12 +37,12 @@ CMSSWRELEASE=CMSSW_7_1_20_patch3
 scram p CMSSW $CMSSWRELEASE
 cd $CMSSWRELEASE/src
 mkdir -p Configuration/GenProduction/python/
-cp ${BASEDIR}/input/${HADRONIZER} Configuration/GenProduction/python/
+cp ${BASEDIR}/inputs/${HADRONIZER} Configuration/GenProduction/python/
 scram b -j 1
 eval `scram runtime -sh`
 cd -
 
-tar xvaf ${BASEDIR}/input/${TARBALL}
+tar xvaf ${BASEDIR}/inputs/${TARBALL}
 
 sed -i 's/exit 0//g' runcmsgrid.sh
 
@@ -62,8 +66,8 @@ ls -lhrt
 #############
 #############
 # Generate GEN-SIM
-
-cmsDriver.py Configuration/GenProduction/python/${HADRONIZER} --filein file:${outfilename}.lhe --fileout file:${outfilename}_gensim.root --mc --eventcontent RAWSIM --customise SLHCUpgradeSimulations/Configuration/postLS1Customs.customisePostLS1,Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM --conditions MCRUN2_71_V1::All --beamspot Realistic50ns13TeVCollision --step GEN,SIM --magField 38T_PostLS1 --python_filename ${outfilename}_gensim.py --no_exec -n 1000
+echo "1.) GENERATING GEN-SIM"
+cmsDriver.py Configuration/GenProduction/python/${HADRONIZER} --filein file:${outfilename}.lhe --fileout file:${outfilename}_gensim.root --mc --eventcontent RAWSIM --customise SLHCUpgradeSimulations/Configuration/postLS1Customs.customisePostLS1,Configuration/DataProcessing/Utils.addMonitoring --datatier GEN-SIM --conditions MCRUN2_71_V1::All --beamspot Realistic50ns13TeVCollision --step GEN,SIM --magField 38T_PostLS1 --python_filename ${outfilename}_gensim.py --no_exec -n ${nevent}
 
 
 #Make each file unique to make later publication possible
@@ -93,8 +97,8 @@ cd CMSSW_8_0_21/src
 eval `scram runtime -sh`
 cd -
 
-cp ${BASEDIR}/input/pu_files.py .
-cp ${BASEDIR}/input/aod_template.py .
+cp ${BASEDIR}/inputs/pu_files.py .
+cp ${BASEDIR}/inputs/aod_template.py .
 
 sed -i 's/XX-GENSIM-XX/'${outfilename}'/g' aod_template.py
 sed -i 's/XX-AODFILE-XX/'${outfilename}'/g' aod_template.py
@@ -102,8 +106,8 @@ sed -i 's/XX-AODFILE-XX/'${outfilename}'/g' aod_template.py
 mv aod_template.py ${outfilename}_1_cfg.py
 
 cmsRun ${outfilename}_1_cfg.py
-
-cmsDriver.py step2 --filein file:${outfilename}_step1.root --fileout file:${outfilename}_aod.root --mc --eventcontent AODSIM --runUnscheduled --datatier AODSIM --conditions 80X_mcRun2_asymptotic_2016_TrancheIV_v6 --step RAW2DIGI,RECO,EI --nThreads 1 --era Run2_2016 --python_filename ${outfilename}_2_cfg.py --no_exec --customise Configuration/DataProcessing/Utils.addMonitoring -n 1000
+echo "2.) GENERATING AOD"
+cmsDriver.py step2 --filein file:${outfilename}_step1.root --fileout file:${outfilename}_aod.root --mc --eventcontent AODSIM --runUnscheduled --datatier AODSIM --conditions 80X_mcRun2_asymptotic_2016_TrancheIV_v6 --step RAW2DIGI,RECO,EI --nThreads 1 --era Run2_2016 --python_filename ${outfilename}_2_cfg.py --no_exec --customise Configuration/DataProcessing/Utils.addMonitoring -n ${nevent}
 
 #Run
 cmsRun ${outfilename}_2_cfg.py
@@ -112,8 +116,8 @@ cmsRun ${outfilename}_2_cfg.py
 ###########
 ###########
 # Generate MiniAODv2
-
-cmsDriver.py step1 --filein file:${outfilename}_aod.root --fileout file:${outfilename}_miniaod.root --mc --eventcontent MINIAODSIM --runUnscheduled --datatier MINIAODSIM --conditions 80X_mcRun2_asymptotic_2016_TrancheIV_v6 --step PAT --nThreads 1 --era Run2_2016 --python_filename ${outfilename}_miniaod_cfg.py --no_exec --customise Configuration/DataProcessing/Utils.addMonitoring -n 1000
+echo "3.) Generating MINIAOD"
+cmsDriver.py step1 --filein file:${outfilename}_aod.root --fileout file:${outfilename}_miniaod.root --mc --eventcontent MINIAODSIM --runUnscheduled --datatier MINIAODSIM --conditions 80X_mcRun2_asymptotic_2016_TrancheIV_v6 --step PAT --nThreads 1 --era Run2_2016 --python_filename ${outfilename}_miniaod_cfg.py --no_exec --customise Configuration/DataProcessing/Utils.addMonitoring -n ${nevent}
 
 #Run
 cmsRun ${outfilename}_miniaod_cfg.py
@@ -125,23 +129,25 @@ cmsRun ${outfilename}_miniaod_cfg.py
 # Stage out
 
 #v1
-tar xf $BASEDIR/input/copy.tar
+tar xf $BASEDIR/inputs/copy.tar
 
 # define base output location
-REMOTE_USER_DIR="/user/bmaier/moriond17/$PROCESS"
+REMOTE_USER_DIR="/store/user/shoh/miniaod/$PROCESS"
 
 
 ls -lrht
 
-if which gfal-copy
-then
-    gfal-copy ${outfilename}_miniaod.root gsiftp://se01.cmsaf.mit.edu:2811/cms/store${REMOTE_USER_DIR}/${outfilename}_miniaod.root
-elif which lcg-cp
-then
-    lcg-cp -v -D srmv2 -b file://$PWD/${outfilename}_miniaod.root gsiftp://se01.cmsaf.mit.edu:2811/cms/store${REMOTE_USER_DIR}/${outfilename}_miniaod.root
-else
-    echo "No way to copy something."                                                                                                                                         
-    exit 1
-fi
+xrdcp file:///$PWD/${outfilename}_miniaod.root root://cmseos.fnal.gov/${REMOTE_USER_DIR}/${outfilename}_miniaod.root
+
+#if which gfal-copy
+#then
+#    gfal-copy ${outfilename}_miniaod.root gsiftp://se01.cmsaf.mit.edu:2811/cms/store${REMOTE_USER_DIR}/${outfilename}_miniaod.root
+#elif which lcg-cp
+#then
+#    lcg-cp -v -D srmv2 -b file://$PWD/${outfilename}_miniaod.root gsiftp://se01.cmsaf.mit.edu:2811/cms/store${REMOTE_USER_DIR}/${outfilename}_miniaod.root
+#else
+    #echo "No way to copy something."                                                                                                                                         
+#    exit 1
+#fi
 
 echo "DONE."

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-export TARBALLDIR="/work/bmaier/production/running_from_tarball"
+export TARBALLDIR="/uscms_data/d1/shoh/private_production/running_from_tarball"
 export BASEDIR=${PWD}
 rm -r work_${1}
 mkdir work_${1}
@@ -22,12 +22,12 @@ else
     echo "You want to merge the T2 files for $1? Ok."
 fi
 
-mkdir -p ./submit/input/
-cp ${TARBALLDIR}/inputs/${1}_tarball.tar.xz ./submit/input/
-cp ${TARBALLDIR}/inputs/${1}_hadronizer.py ./submit/input/
-cp inputs/copy.tar ./submit/input/
-cp inputs/aod_template.py ./submit/input/
-cp inputs/pu_files.py ./submit/input/
+mkdir -p ./submit/inputs/
+cp ${TARBALLDIR}/inputs/${1}_tarball.tar.xz ./submit/inputs/
+cp ${TARBALLDIR}/inputs/${1}_hadronizer.py ./submit/inputs/
+cp inputs/copy.tar ./submit/inputs/
+cp inputs/aod_template.py ./submit/inputs/
+cp inputs/pu_files.py ./submit/inputs/
 
 #x509
 voms-proxy-init -voms cms -valid 172:00
@@ -36,7 +36,7 @@ cp /tmp/x509up_u$UID $SUBMIT_WORKDIR/x509up
 #creating tarball
 echo "Tarring up submit..."
 tar -chzf submit.tgz submit 
-rm -r ${BASEDIR}/submit/input/*
+rm -r ${BASEDIR}/submit/inputs/*
 
 mv submit.tgz $SUBMIT_WORKDIR
 
