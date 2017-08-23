@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-export TARBALLDIR="/uscms_data/d1/shoh/private_production/running_from_tarball"
+export TARBALLDIR="/uscms/home/shoh/work/running_from_tarball"
 export BASEDIR=${PWD}
 rm -r work_${1}
 mkdir work_${1}
