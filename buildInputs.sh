@@ -1,9 +1,13 @@
 #!/bin/bash
 
+set -e
 
-export TARBALLDIR="/uscms/home/shoh/work/running_from_tarball"
+export TARBALLDIR="/uscms_data/d1/shoh/private_production/running_from_tarball"
+export EOSSPACE="/eos/uscms/store/user/shoh/gridpacks/DiZprime/Vector"
 export BASEDIR=${PWD}
+if [ -e "work_${1}" ];then
 rm -r work_${1}
+fi
 mkdir work_${1}
 export SUBMIT_WORKDIR=${PWD}/work_${1}
 
@@ -23,7 +27,7 @@ else
 fi
 
 mkdir -p ./submit/inputs/
-cp ${TARBALLDIR}/inputs/${1}_tarball.tar.xz ./submit/inputs/
+cp ${EOSSPACE}/${1}_tarball.tar.xz ./submit/inputs/
 cp ${TARBALLDIR}/inputs/${1}_hadronizer.py ./submit/inputs/
 cp inputs/copy.tar ./submit/inputs/
 cp inputs/aod_template.py ./submit/inputs/
