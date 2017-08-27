@@ -132,8 +132,7 @@ cmsRun ${outfilename}_miniaod_cfg.py
 tar xf $BASEDIR/inputs/copy.tar
 
 # define base output location
-REMOTE_USER_DIR="/store/user/shoh/miniaod/$PROCESS"
-
+#REMOTE_USER_DIR=""
 
 ls -lrht
 
