@@ -1,8 +1,10 @@
 #!/bin/bash                                                                                        
+
+set -e
                                                                                                                                                                                     
 eos="/store/user/shoh/gridpacks/DiZprime/Vector"
 
-njob="2"
+njob="2500"
 
 if [ -e multisubmit.sh ];then
 rm multisubmit.sh
@@ -10,7 +12,7 @@ fi
 
 echo "#!/bin/bash" > multisubmit.sh
 
-for file in `(ls ${eos})`
+for file in `(ls /eos/uscms${eos})`
 do
 xrdcp root://cmseos.fnal.gov//${eos}/${file} inputs/
 
