@@ -17,7 +17,7 @@ git clone -b cmslpc-80X git@github.com:SiewYan/running_from_tarball.git
 # Submit on a single gridpacks
 
 1. Put your tarball/gridpack into the ```inputs/``` folder together with an appropriate hadronizer that has the same name.
-2. Additionally, comment (line)[https://github.com/SiewYan/running_from_tarball/blob/cmslpc-80X/buildInputs.sh#L8] and uncomment (line)[https://github.com/SiewYan/running_from_tarball/blob/cmslpc-80X/buildInputs.sh#L9] to point to ```inputs/```.
+2. Additionally, comment [line](https://github.com/SiewYan/running_from_tarball/blob/cmslpc-80X/buildInputs.sh#L8) and uncomment [line](https://github.com/SiewYan/running_from_tarball/blob/cmslpc-80X/buildInputs.sh#L9) to point to ```inputs/```.
 3. Prepare and submit by running, $njob --> number of jobs:
 ```bash
 sh buildInputs.sh EWKZ2Jets_ZToLL_M-50_13TeV-madgraph-pythia8
@@ -26,10 +26,10 @@ python submit.py work_EWKZ2Jets_ZToLL_M-50_13TeV-madgraph-pythia8 $njobs
 
 # Submit on multiple gridpacks
 
-1. Specify the (location)[https://github.com/SiewYan/running_from_tarball/blob/cmslpc-80X/multibuild.sh#L6] (absolute path) of your gridpacks.
+1. Specify the [location](https://github.com/SiewYan/running_from_tarball/blob/cmslpc-80X/multibuild.sh#L6) (absolute path) of your gridpacks.
 2. Revert step specify in (2) in Run on single gridpacks to put to your pre-defined EOS space.
-2. Adjust the number of (jobs)[https://github.com/SiewYan/running_from_tarball/blob/cmslpc-80X/multibuild.sh#L11] desire to produce, for example, if 100 events produced per job, 2500 jobs would have 250000 events.
-3. Pre-define your grid password in (auto)[https://github.com/SiewYan/running_from_tarball/blob/cmslpc-80X/auto#L3] to facilitate hassle-free passwordless job preparation. WARNING: please mask/remove your password once job setup is done to avoid exposure to unscrupulous individual.
+2. Adjust the number of [jobs](https://github.com/SiewYan/running_from_tarball/blob/cmslpc-80X/multibuild.sh#L11) desire to produce, for example, if 100 events produced per job, 2500 jobs would have 250000 events.
+3. Pre-define your grid password in [auto](https://github.com/SiewYan/running_from_tarball/blob/cmslpc-80X/auto#L3) to facilitate hassle-free passwordless job preparation. WARNING: please mask/remove your password once job setup is done to avoid exposure to unscrupulous individual.
 4. Run the setup
 
 ```bash
@@ -42,6 +42,6 @@ python submit.py work_EWKZ2Jets_ZToLL_M-50_13TeV-madgraph-pythia8 $njobs
 ./multisubmit.sh
 ```
 
-5. Monitor!! with cmslpc landscape (dashboard)[https://landscape.fnal.gov/lpc/dashboard/db/user-batch-summary?refresh=5m&orgId=1&var-cluster=cms-lpc&var-user=shoh].
+5. Monitor!! with cmslpc landscape [dashboard](https://landscape.fnal.gov/lpc/dashboard/db/user-batch-summary?refresh=5m&orgId=1&var-cluster=cms-lpc&var-user=shoh).
 6. Bon Voyage.
 
