@@ -2,7 +2,8 @@
 
 set -e
 
-#GRIDPACK DIR, FULL PATH                                                                                                                                                                                                                      dir="/eos/uscms/store/user/shoh/gridpacks/DarkHiggs/BBbarDM"
+#GRIDPACK DIR, FULL PATH                                                                                                                                                                                                                     
+dir="/eos/uscms/store/user/shoh/gridpacks/DarkHiggs/BBbarDM"
 export eos_input=`(echo $dir | awk -F "uscms" '{print $2}')`
 files=`ls $dir`
                         
