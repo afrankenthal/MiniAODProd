@@ -14,7 +14,7 @@ git clone -b cmslpc-80X git@github.com:SiewYan/running_from_tarball.git
 
 ## Submit to condor cmslpc
 
-# Submit on a single gridpacks
+### Submit on a single gridpacks
 
 1. Put your tarball/gridpack into the ```inputs/``` folder together with an appropriate hadronizer that has the same name.
 2. Additionally, comment [line](https://github.com/SiewYan/running_from_tarball/blob/cmslpc-80X/buildInputs.sh#L8) and uncomment [line](https://github.com/SiewYan/running_from_tarball/blob/cmslpc-80X/buildInputs.sh#L9) to point to ```inputs/```.
@@ -24,10 +24,10 @@ sh buildInputs.sh EWKZ2Jets_ZToLL_M-50_13TeV-madgraph-pythia8
 python submit.py work_EWKZ2Jets_ZToLL_M-50_13TeV-madgraph-pythia8 $njobs
 ```
 
-# Submit on multiple gridpacks
+### Submit on multiple gridpacks
 
 1. Specify the [location](https://github.com/SiewYan/running_from_tarball/blob/cmslpc-80X/multibuild.sh#L6) (absolute path) of your gridpacks.
-2. Revert step specify in (2) in Run on single gridpacks to put to your pre-defined EOS space.
+2. Revert step specify in (2) in **Submit on a single gridpacks** to put to your pre-defined EOS space.
 2. Adjust the number of [jobs](https://github.com/SiewYan/running_from_tarball/blob/cmslpc-80X/multibuild.sh#L11) desire to produce, for example, if 100 events produced per job, 2500 jobs would have 250000 events.
 3. Pre-define your grid password in [auto](https://github.com/SiewYan/running_from_tarball/blob/cmslpc-80X/auto#L3) to facilitate hassle-free passwordless job preparation. WARNING: please mask/remove your password once job setup is done to avoid exposure to unscrupulous individual.
 4. Run the setup
@@ -45,3 +45,19 @@ python submit.py work_EWKZ2Jets_ZToLL_M-50_13TeV-madgraph-pythia8 $njobs
 5. Monitor!! with cmslpc landscape [dashboard](https://landscape.fnal.gov/lpc/dashboard/db/user-batch-summary?refresh=5m&orgId=1&var-cluster=cms-lpc&var-user=shoh).
 6. Bon Voyage.
 
+## Signal generation  era
+1. Below list the current configuration of 80X era for the signal generation, in the future event this will been to be changed according for 92X era.
+
+```bash
+
+#GEN-SIM generation --> 
+CMSSWRELEASE : CMSSW_7_1_20_patch3
+SCRAM_ARCH   : slc6_amd64_gcc481
+conditions   : MCRUN2_71_V1::All
+
+#AOD and MiniAODv2 generation --> 
+CMSSWRELEASE : CMSSW_8_0_21
+SCRAM_ARCH   : slc6_amd64_gcc530
+conditions   : 80X_mcRun2_asymptotic_2016_TrancheIV_v6
+
+```
