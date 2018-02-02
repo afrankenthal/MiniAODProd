@@ -1,6 +1,6 @@
 # Running from Tarball in cmslpc
 
-This is a small tool to privately generate RunIISummer16MiniAODv2 events from a standard CMS gridpack (i.e. the output has to be a cmsgrid_final.lhe file).
+This is a small tool to privately generate RunIISummer16MiniAODv2 events from a standard CMS gridpack.
 
 ## Installation
 1. Please fork the following package and branch in your dedicated area:
@@ -28,7 +28,7 @@ python submit.py work_EWKZ2Jets_ZToLL_M-50_13TeV-madgraph-pythia8 $njobs
 
 1. Specify the [location](https://github.com/SiewYan/running_from_tarball/blob/cmslpc-80X/multibuild.sh#L6) (absolute path) of your gridpacks.
 2. Revert step specify in (2) in **Submit on a single gridpacks** to put to your pre-defined EOS space.
-2. Adjust the number of [jobs](https://github.com/SiewYan/running_from_tarball/blob/cmslpc-80X/multibuild.sh#L11) desire to produce, for example, if 100 events produced per job, 2500 jobs would have 250000 events.
+2. Adjust the number of [jobs](https://github.com/SiewYan/running_from_tarball/blob/cmslpc-80X/multibuild.sh#L11) desire to produce, for example, if [100](https://github.com/SiewYan/running_from_tarball/blob/cmslpc-80X/submit/runEventGeneration.sh#L17) events produced per job, 2500 jobs would have 250000 events.
 3. Pre-define your grid password in [auto](https://github.com/SiewYan/running_from_tarball/blob/cmslpc-80X/auto#L3) to facilitate hassle-free passwordless job preparation. WARNING: please mask/remove your password once job setup is done to avoid exposure to unscrupulous individual.
 4. Run the setup
 
