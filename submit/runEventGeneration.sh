@@ -62,6 +62,13 @@ outfilename="${outfilename_tmp//[[:space:]]/}"
 mv cmsgrid_final.lhe ${outfilename}.lhe
 
 ls -lhrt
+
+export SCRAM_ARCH=slc6_amd64_gcc630
+scram p CMSSW CMSSW_9_4_0
+cd CMSSW_9_4_0/src
+eval `scram runtime -sh`
+cd -
+
 #
 #############
 #############
@@ -92,11 +99,11 @@ cmsRun ${outfilename}_gensim.py
 ############
 # Generate AOD
 
-export SCRAM_ARCH=slc6_amd64_gcc630
-scram p CMSSW CMSSW_9_4_0
-cd CMSSW_9_4_0/src
-eval `scram runtime -sh`
-cd -
+#export SCRAM_ARCH=slc6_amd64_gcc630
+#scram p CMSSW CMSSW_9_4_0
+#cd CMSSW_9_4_0/src
+#eval `scram runtime -sh`
+#cd -
 
 cp ${BASEDIR}/inputs/pu_files.py .
 cp ${BASEDIR}/inputs/aod_template.py .

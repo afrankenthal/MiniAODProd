@@ -5,6 +5,7 @@ export TARBALLDIR=${PWD}
 export BASEDIR=${PWD}
 if [ -d work_${1} ] ; then
     rm -r work_${1}
+fi ;
 mkdir work_${1}
 export SUBMIT_WORKDIR=${PWD}/work_${1}
 
