@@ -2,12 +2,12 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: step1 --filein file:filein.root --fileout file:B2G-RunIISummer16DR80Premix-00003_step1.root --pileup_input file:pu.root --mc --eventcontent PREMIXRAW --datatier GEN-SIM-RAW --conditions 80X_mcRun2_asymptotic_2016_TrancheIV_v6 --step DIGIPREMIX_S2,DATAMIX,L1,DIGI2RAW,HLT:@frozen2016 --nThreads 4 --datamix PreMix --era Run2_2016 --python_filename B2G-RunIISummer16DR80Premix-00003_1_cfg.py --no_exec --customise Configuration/DataProcessing/Utils.addMonitoring -n 1000
+# with command line options: step1 --filein file:fileIn.root --fileout file:fall17_GEN-SIM-RAW_step1.root --pileup_input file:pu.root --mc --eventcontent PREMIXRAW --datatier GEN-SIM-RAW --conditions auto:phase1_2017_realistic --step DIGIPREMIX_S2,DATAMIX,L1,DIGI2RAW,HLT:2e34v40 --nThreads 8 --datamix PreMix --era Run2_2017 --python_filename RunIIFall17DRPremix_GEN-SIM-RAW_step1_cfg.py --no_exec --customise Configuration/DataProcessing/Utils.addMonitoring -n 1000
 import FWCore.ParameterSet.Config as cms
 import pu_files as pu_f
 from Configuration.StandardSequences.Eras import eras
 
-process = cms.Process('HLT',eras.Run2_2016)
+process = cms.Process('HLT',eras.Run2_2017)
 
 # import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')
@@ -22,7 +22,7 @@ process.load('SimGeneral.MixingModule.digi_MixPreMix_cfi')
 process.load('Configuration.StandardSequences.DataMixerPreMix_cff')
 process.load('Configuration.StandardSequences.SimL1EmulatorDM_cff')
 process.load('Configuration.StandardSequences.DigiToRawDM_cff')
-process.load('HLTrigger.Configuration.HLT_25ns15e33_v4_cff')
+process.load('HLTrigger.Configuration.HLT_2e34v40_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
@@ -54,7 +54,6 @@ process.PREMIXRAWoutput = cms.OutputModule("PoolOutputModule",
         dataTier = cms.untracked.string('GEN-SIM-RAW'),
         filterName = cms.untracked.string('')
     ),
-    eventAutoFlushCompressedSize = cms.untracked.int32(5242880),
     fileName = cms.untracked.string('file:XX-AODFILE-XX_step1.root'),
     outputCommands = process.PREMIXRAWEventContent.outputCommands,
     splitLevel = cms.untracked.int32(0)
@@ -66,7 +65,7 @@ process.PREMIXRAWoutput = cms.OutputModule("PoolOutputModule",
 process.mix.digitizers = cms.PSet(process.theDigitizersMixPreMix)
 process.mixData.input.fileNames = cms.untracked.vstring(['root://cmsxrootd.fnal.gov/' + f for f in pu_f.mixFiles])
 from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, '80X_mcRun2_asymptotic_2016_TrancheIV_v6', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase1_2017_realistic', '')
 
 # Path and EndPath definitions
 process.digitisation_step = cms.Path(process.pdigi)
@@ -80,9 +79,11 @@ process.PREMIXRAWoutput_step = cms.EndPath(process.PREMIXRAWoutput)
 process.schedule = cms.Schedule(process.digitisation_step,process.datamixing_step,process.L1simulation_step,process.digi2raw_step)
 process.schedule.extend(process.HLTSchedule)
 process.schedule.extend([process.endjob_step,process.PREMIXRAWoutput_step])
+from PhysicsTools.PatAlgos.tools.helpers import associatePatAlgosToolsTask
+associatePatAlgosToolsTask(process)
 
 #Setup FWK for multithreaded
-process.options.numberOfThreads=cms.untracked.uint32(4)
+process.options.numberOfThreads=cms.untracked.uint32(8)
 process.options.numberOfStreams=cms.untracked.uint32(0)
 
 # customisation of the process.
@@ -94,10 +95,16 @@ from Configuration.DataProcessing.Utils import addMonitoring
 process = addMonitoring(process)
 
 # Automatic addition of the customisation function from HLTrigger.Configuration.customizeHLTforMC
-from HLTrigger.Configuration.customizeHLTforMC import customizeHLTforFullSim 
+from HLTrigger.Configuration.customizeHLTforMC import customizeHLTforMC 
 
-#call to customisation function customizeHLTforFullSim imported from HLTrigger.Configuration.customizeHLTforMC
-process = customizeHLTforFullSim(process)
+#call to customisation function customizeHLTforMC imported from HLTrigger.Configuration.customizeHLTforMC
+process = customizeHLTforMC(process)
 
 # End of customisation functions
 
+# Customisation from command line
+
+# Add early deletion of temporary data products to reduce peak memory need
+from Configuration.StandardSequences.earlyDeleteSettings_cff import customiseEarlyDelete
+process = customiseEarlyDelete(process)
+# End adding early deletion
