@@ -1,9 +1,10 @@
 #!/bin/bash
 
 
-export TARBALLDIR="/uscms/home/shoh/work/running_from_tarball"
+export TARBALLDIR=${PWD}
 export BASEDIR=${PWD}
-rm -r work_${1}
+if [ -d work_${1} ] ; then
+    rm -r work_${1}
 mkdir work_${1}
 export SUBMIT_WORKDIR=${PWD}/work_${1}
 

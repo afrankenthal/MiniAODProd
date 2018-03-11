@@ -25,7 +25,7 @@ arguments = $(Process)
 use_x509userproxy = True                                                                                                                                                                                   
 x509userproxy = /tmp/x509up_u{2}                                                                                                                                                                           
 #on_exit_hold = (ExitBySignal == True) || (ExitCode != 0)                                                                                                                                                  
-+AccountingGroup = "analysis.shoh"  
++AccountingGroup = "analysis.wsi"  
 +AcctGroup = "analysis"                                                                                                                                                                                    
 +ProjectName = "DarkMatterSimulation"                                                                                                                                                                    
 queue {3}  
