@@ -2,8 +2,10 @@
 
 from sys import argv
 from os import system,getenv,getuid,getcwd
+import os
 
-logpath=getcwd()+'/logs/'
+logpath=getcwd()+'/logs'
+if not os.path.isdir(logpath): os.mkdir(logpath)
 workpath=getcwd()+'/'+str(argv[1])
 uid=getuid()
 
