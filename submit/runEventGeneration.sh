@@ -14,7 +14,7 @@ export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch
 source $VO_CMS_SW_DIR/cmsset_default.sh
 source inputs.sh
 
-export nevent="1000"
+export nevent="10"
 
 #
 #############
@@ -38,11 +38,11 @@ scram p CMSSW $CMSSWRELEASE
 cd $CMSSWRELEASE/src
 mkdir -p Configuration/GenProduction/python/
 cp ${BASEDIR}/inputs/${HADRONIZER} Configuration/GenProduction/python/
-scram b -j 1
+scram b -j 4
 eval `scram runtime -sh`
 cd -
 
-tar xvaf ${BASEDIR}/inputs/${TARBALL}
+tar xaf ${BASEDIR}/inputs/${TARBALL}
 
 sed -i 's/exit 0//g' runcmsgrid.sh
 
@@ -75,7 +75,7 @@ cd -
 # Generate GEN-SIM
 # CMSSW_9_3_X
 echo "1.) GENERATING GEN-SIM"
-cmsDriver.py Configuration/GenProduction/python/${HADRONIZER} --filein file:${outfilename}.lhe --fileout file:${outfilename}_gensim.root --mc --eventcontent RAWSIM --datatier GEN-SIM --conditions auto:phase1_2017_realistic --beamspot Realistic25ns13TeV2017Collision --step GEN,SIM --era Run2_2017 --customise Configuration/DataProcessing/Utils.addMonitoring --python_filename ${outfilename}_gensim.py --no_exec -n ${nevent}
+cmsDriver.py Configuration/GenProduction/python/${HADRONIZER} --filein file:${outfilename}.lhe --fileout file:${outfilename}_gensim.root --mc --eventcontent RAWSIM --datatier GEN-SIM --conditions auto:phase1_2017_realistic --beamspot Realistic25ns13TeVEarly2017Collision --step GEN,SIM --era Run2_2017 --customise Configuration/DataProcessing/Utils.addMonitoring --python_filename ${outfilename}_gensim.py --no_exec -n ${nevent}
 
 
 #Make each file unique to make later publication possible
@@ -90,6 +90,20 @@ echo "    firstLuminosityBlock = cms.untracked.uint32($RANDOMSEED)," >> head.py
 cat tail.py >> head.py
 mv head.py ${outfilename}_gensim.py
 rm -rf tail.py
+
+
+#Add SkipEvents options to prevent runtime abort
+linenumber=`grep -n 'process.options' ${outfilename}_gensim.py | awk '{print $1}'`
+linenumber=${linenumber%:*}
+total_linenumber=`cat ${outfilename}_gensim.py | wc -l`
+bottom_linenumber=$((total_linenumber - $linenumber ))
+tail -n $bottom_linenumber ${outfilename}_gensim.py > tail.py
+head -n $linenumber ${outfilename}_gensim.py > head.py
+echo "    SkipEvent = cms.untracked.vstring('ProductNotFound')" >> head.py
+cat tail.py >> head.py
+mv head.py ${outfilename}_gensim.py
+rm -rf tail.py
+
 
 #Run
 cmsRun ${outfilename}_gensim.py
@@ -125,7 +139,7 @@ cmsRun ${outfilename}_2_cfg.py
 ###########
 # Generate MiniAODv2
 echo "3.) Generating MINIAOD"
-cmsDriver.py step3 --filein file:${outfilename}_aod.root --fileout file:${outfilename}_miniaod.root --mc --eventcontent MINIAODSIM --datatier MINIAODSIM --conditions auto:phase1_2017_realistic --step PAT --nThreads 1 --era Run2_2017 --python_filename ${outfilename}_miniaod_cfg.py --no_exec --customise Configuration/DataProcessing/Utils.addMonitoring -n ${nevent}
+cmsDriver.py step3 --filein file:${outfilename}_aod.root --fileout file:${outfilename}_miniaod.root --mc --eventcontent MINIAODSIM --datatier MINIAODSIM --runUnscheduled --conditions auto:phase1_2017_realistic --step PAT --nThreads 4 --era Run2_2017 --python_filename ${outfilename}_miniaod_cfg.py --no_exec --customise Configuration/DataProcessing/Utils.addMonitoring -n ${nevent}
 
 #Run
 cmsRun ${outfilename}_miniaod_cfg.py
