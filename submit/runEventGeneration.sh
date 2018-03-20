@@ -60,12 +60,13 @@ outfilename_tmp="$PROCESS"'_'"$RANDOMSEED"
 outfilename="${outfilename_tmp//[[:space:]]/}"
 
 mv cmsgrid_final.lhe ${outfilename}.lhe
+rm -rf $CMSSWRELEASE
 
 ls -lhrt
 
 export SCRAM_ARCH=slc6_amd64_gcc630
-scram p CMSSW CMSSW_9_4_0
-cd CMSSW_9_4_0/src
+scram p CMSSW CMSSW_9_4_4
+cd CMSSW_9_4_4/src
 mkdir -p Configuration/GenProduction/python/
 cp ${BASEDIR}/inputs/${HADRONIZER} Configuration/GenProduction/python/
 cp ../../${outfilename}.lhe .
@@ -77,7 +78,7 @@ eval `scram runtime -sh`
 #############
 #############
 # Generate GEN-SIM
-# CMSSW_9_3_X
+# CMSSW_9_4_X
 echo "1.) GENERATING GEN-SIM"
 cmsDriver.py Configuration/GenProduction/python/${HADRONIZER} --filein file:${outfilename}.lhe --fileout file:${outfilename}_gensim.root --mc --eventcontent RAWSIM --datatier GEN-SIM --conditions auto:phase1_2017_realistic --beamspot Realistic25ns13TeVEarly2017Collision --step GEN,SIM --era Run2_2017 --customise Configuration/DataProcessing/Utils.addMonitoring --python_filename ${outfilename}_gensim.py --no_exec -n ${nevent}
 
@@ -133,7 +134,7 @@ mv aod_template.py ${outfilename}_1_cfg.py
 
 cmsRun ${outfilename}_1_cfg.py
 echo "2.) GENERATING AOD"
-cmsDriver.py step2 --filein file:${outfilename}_step1.root --fileout file:${outfilename}_aod.root --mc --eventcontent AODSIM --datatier AODSIM --conditions auto:phase1_2017_realistic --step RAW2DIGI,L1Reco,RECO --nThreads 1 --era Run2_2017 --python_filename ${outfilename}_2_cfg.py --no_exec --customise Configuration/DataProcessing/Utils.addMonitoring -n ${nevent}
+cmsDriver.py step2 --filein file:${outfilename}_step1.root --fileout file:${outfilename}_aod.root --mc --eventcontent AODSIM --datatier AODSIM --runUnscheduled --conditions auto:phase1_2017_realistic --step RAW2DIGI,L1Reco,RECO --nThreads 8 --era Run2_2017 --python_filename ${outfilename}_2_cfg.py --no_exec --customise Configuration/DataProcessing/Utils.addMonitoring -n ${nevent}
 
 #Run
 cmsRun ${outfilename}_2_cfg.py
@@ -143,7 +144,7 @@ cmsRun ${outfilename}_2_cfg.py
 ###########
 # Generate MiniAODv2
 echo "3.) Generating MINIAOD"
-cmsDriver.py step3 --filein file:${outfilename}_aod.root --fileout file:${outfilename}_miniaod.root --mc --eventcontent MINIAODSIM --datatier MINIAODSIM --runUnscheduled --conditions auto:phase1_2017_realistic --step PAT --nThreads 4 --era Run2_2017 --python_filename ${outfilename}_miniaod_cfg.py --no_exec --customise Configuration/DataProcessing/Utils.addMonitoring -n ${nevent}
+cmsDriver.py step3 --filein file:${outfilename}_aod.root --fileout file:${outfilename}_miniaod.root --mc --eventcontent MINIAODSIM --datatier MINIAODSIM --runUnscheduled --conditions auto:phase1_2017_realistic --step PAT --nThreads 8 --era Run2_2017 --python_filename ${outfilename}_miniaod_cfg.py --no_exec --customise Configuration/DataProcessing/Utils.addMonitoring -n ${nevent}
 
 #Run
 cmsRun ${outfilename}_miniaod_cfg.py

@@ -2,7 +2,7 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: step1 --filein file:fileIn.root --fileout file:fall17_GEN-SIM-RAW_step1.root --pileup_input file:pu.root --mc --eventcontent PREMIXRAW --datatier GEN-SIM-RAW --conditions auto:phase1_2017_realistic --step DIGIPREMIX_S2,DATAMIX,L1,DIGI2RAW,HLT:2e34v40 --nThreads 8 --datamix PreMix --era Run2_2017 --python_filename RunIIFall17DRPremix_GEN-SIM-RAW_step1_cfg.py --no_exec --customise Configuration/DataProcessing/Utils.addMonitoring -n 1000
+# with command line options: step1 --filein file:fileIn.root --fileout file:fall17_GEN-SIM-RAW_step1.root --pileup_input dbs:/Neutrino_E-10_gun/RunIISummer17PrePremix-MCv2_correctPU_94X_mc2017_realistic_v9-v1/GEN-SIM-DIGI-RAW --mc --eventcontent PREMIXRAW --datatier GEN-SIM-RAW --conditions auto:phase1_2017_realistic --step DIGIPREMIX_S2,DATAMIX,L1,DIGI2RAW,HLT:2e34v40 --nThreads 8 --datamix PreMix --era Run2_2017 --python_filename RunIIFall17DRPremix_GEN-SIM-RAW_step1_cfg.py --no_exec --customise Configuration/DataProcessing/Utils.addMonitoring -n 1000
 import FWCore.ParameterSet.Config as cms
 import pu_files as pu_f
 from Configuration.StandardSequences.Eras import eras
