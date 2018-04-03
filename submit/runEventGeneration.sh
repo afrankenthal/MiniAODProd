@@ -118,12 +118,6 @@ cmsRun ${outfilename}_gensim.py
 ############
 # Generate AOD
 
-#export SCRAM_ARCH=slc6_amd64_gcc630
-#scram p CMSSW CMSSW_9_4_0
-#cd CMSSW_9_4_0/src
-#eval `scram runtime -sh`
-#cd -
-
 cp ${BASEDIR}/inputs/pu_files.py .
 cp ${BASEDIR}/inputs/aod_template.py .
 
@@ -159,13 +153,12 @@ cmsRun ${outfilename}_miniaod_cfg.py
 tar xf $BASEDIR/inputs/copy.tar
 
 # define base output location
-REMOTE_USER_DIR="/store/user/wsi/miniaod/$PROCESS"
+REMOTE_USER_DIR="/store/user/${USER}/miniaod/$PROCESS"
 
 
 ls -lrht
 
 xrdcp file:///$PWD/${outfilename}_miniaod.root root://cmseos.fnal.gov/${REMOTE_USER_DIR}/${outfilename}_miniaod.root
-#xrdcp file:///$PWD/${outfilename}_miniaod.root root://cmseos.fnal.gov//store/user/wsi/miniaod/${PROCESS}/${outfilename}_miniaod.root
 #if which gfal-copy
 #then
 #    gfal-copy ${outfilename}_miniaod.root gsiftp://se01.cmsaf.mit.edu:2811/cms/store${REMOTE_USER_DIR}/${outfilename}_miniaod.root

@@ -1,13 +1,29 @@
-# Running from Tarball
+# MiniAODProd
 
-This is a small tool to privately generate RunIISummer16MiniAODv2 events from a standard CMS gridpack (i.e. the output has to be a cmsgrid_final.lhe file).
+This is a small tool to privately generate **2017MC re-miniAOD (94X version 2) events with PU mixing** from a standard CMS gridpack (i.e. the output has to be a `cmsgrid_final.lhe` file). Working on LPC condor.
+
+*NOTE: still evolving.*
+
+* 2017 MiniAOD documentation (under construction): https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMiniAOD2017
+* Comprehensive list of MiniAOD: https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookMiniAOD
 
 ## Installation
 
 1. Put your tarball/gridpack into the `inputs/` folder together with an appropriate hadronizer that has the same name.
-2. Modify `submit.py`, determining where you want to store logs etc, also specify your base directory in buildInputs.sh: https://github.com/SiewYan/running_from_tarball/blob/lpc-dev/buildInputs.sh#L4
-3. Adjust the desired number of events per job here: https://github.com/SiewYan/running_from_tarball/blob/lpc-dev/submit/runEventGeneration.sh#L17
-4. Modify your output location and site identifier, which is currently set to my EOS space in cmslpc : https://github.com/SiewYan/running_from_tarball/blob/lpc-dev/submit/runEventGeneration.sh#L135
+2. Number of events per job is defined as `nevet` in `./inputs/runEventGeneration.sh`. Change it by your wish.
+    ```bash
+    17 export nevent="500" 
+    ```
+3. In the end, condor will copy the MiniAOD output to a remote site. Currently it's set to a user's LPC EOS space, in `./inputs/runEventGeneration.sh`. Change it by your wish.
+    ```bash
+    161 # define base output location
+    162 REMOTE_USER_DIR="/store/user/${USER}/miniaod/$PROCESS"
+    163
+    164
+    165 ls -lrht
+    166
+    167 xrdcp file:///$PWD/${outfilename}_miniaod.root root://cmseos.fnal.gov/${REMOTE_USER_DIR}/${outfilename}_miniaod.root
+    ```
 
 ## Run
 
