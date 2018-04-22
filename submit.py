@@ -71,11 +71,13 @@ exit 0'''
         else:
             # Deduce decay length [mm] from gridpack name..
             # e.g. SIDMmumu_Mps-200_MZp-1p2_ctau-0p1.tar.xz
-            nameTags = infile.split('.')[0].split('_')
-            for t in nameTags:
-                if 'ctau' in t:
-                    ctau = t.split('-', 1)[-1]
-                    ctau = str( float(ctau.replace('p','.'))*10 )
+            ctau = '0'
+            if 'SIDM' in infile:
+                nameTags = infile.split('.')[0].split('_')
+                for t in nameTags:
+                    if 'ctau' in t:
+                        ctau = t.split('-', 1)[-1]
+                        ctau = str( float(ctau.replace('p','.'))*10 )
             f.write(execF % ('runOffGridpack', infile+' '+ctau))
 
 
