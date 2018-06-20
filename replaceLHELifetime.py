@@ -20,37 +20,34 @@ ctau = args.ctau
 
 
 if __name__ == '__main__':
-	
-	inf = open(inFn, 'r')
-	outf = open(inFn+'.tmp', 'w')
+    
+    inf = open(inFn, 'r')
+    outf = open(inFn+'.tmp', 'w')
 
-	eventBegin = False
-	eventEnd = True
-	
-	for line in inf:
-		if line.startswith('<event>'):
-			eventBegin = True
-			eventEnd = False
-		if line.startswith('</event>'):
-			eventBegin = False
-			eventEnd = True
+    eventBegin = False
+    eventEnd = True
+    
+    for line in inf:
+        if line.startswith('<event>'):
+            eventBegin = True
+            eventEnd = False
+        if line.startswith('</event>'):
+            eventBegin = False
+            eventEnd = True
 
-		if not (eventBegin==True and eventEnd==False):
-			outf.write(line)
-			continue
-		if line.split()[0] != str(rpid):
-			outf.write(line)
-			continue
-		else:
-			# elem = 
-			assert(len(line.split())==13)
-			untouched = 9 + 5*5 + 19*5
-			togo = line[:untouched] + \
-			' ' + '{0:.5E}'.format(random.expovariate(1./ctau)) + \
-			' ' + line[-4:]
-			outf.write(togo)
+        if not (eventBegin==True and eventEnd==False):
+            outf.write(line)
+            continue
+        if line.split()[0] != str(rpid):
+            outf.write(line)
+            continue
+        else:
+            assert(len(line.split())==13)
+            togo = line.split()
+            togo[11] = '{0:.5E}'.format(random.expovariate(1./ctau))
+            outf.write(' '.join(togo) + '\n')
 
-	outf.close()
-	inf.close()
+    outf.close()
+    inf.close()
 
-	os.system('mv {0}.tmp {0}'.format(inFn))
+    os.system('mv {0}.tmp {0}'.format(inFn))
