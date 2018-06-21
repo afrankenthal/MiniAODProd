@@ -22,6 +22,7 @@ done''' % user
         if mode=='lhe':
             os.makedirs(workpath+'/submit/mgLHEs')
             os.system('cp mgLHEs/%s %s/submit/mgLHEs' % (infile, workpath))
+            os.system('cp replaceLHELifetime.py %s/submit' % workpath)
             os.system('cp runOffLHE.sh %s/submit' % workpath)
             with open('%s/submit/runOffLHE.sh' % workpath, 'a') as f:
                 f.write(stageOutPiece)
@@ -66,18 +67,20 @@ rm -r submit/
 
 exit 0'''
     with open(workpath + '/exec.sh', 'w') as f:
+        # Deduce decay length [mm] from gridpack name..
+        # e.g. SIDMmumu_Mps-200_MZp-1p2_ctau-0p1.tar.xz
+        # e.g. SIDMmumu_Mps-202_MZp-1p2_ctau-0p01.lhe.gz
+        ctau = '0'
+        if 'SIDM' in infile:
+            nameTags = infile.split('.')[0].split('_')
+            for t in nameTags:
+                if 'ctau' in t:
+                    ctau = t.split('-', 1)[-1]
+                    ctau = str( float(ctau.replace('p','.'))*10 )
+
         if mode == 'lhe':
-            f.write(execF % ('runOffLHE', infile))
+            f.write(execF % ('runOffLHE', infile+' '+ctau))
         else:
-            # Deduce decay length [mm] from gridpack name..
-            # e.g. SIDMmumu_Mps-200_MZp-1p2_ctau-0p1.tar.xz
-            ctau = '0'
-            if 'SIDM' in infile:
-                nameTags = infile.split('.')[0].split('_')
-                for t in nameTags:
-                    if 'ctau' in t:
-                        ctau = t.split('-', 1)[-1]
-                        ctau = str( float(ctau.replace('p','.'))*10 )
             f.write(execF % ('runOffGridpack', infile+' '+ctau))
 
 

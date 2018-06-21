@@ -1,9 +1,10 @@
 #! /bin/bash
 
-## Usage: ./runOffLHE.sh SIDM_Mps100_Mzp9e-1_DW2e-11.lhe.gz
+## Usage: ./runOffLHE.sh SIDMmumu_Mps-202_MZp-1p2_ctau-0p01.lhe.gz 0.1
 
 export BASEDIR=`pwd`
 LHE_f=$1
+CTau_mm=$2
 MGLHEDIR=${BASEDIR}/mgLHEs
 HADRONIZER="externalLHEProducer_and_PYTHIA8_Hadronizer.py"
 namebase=${LHE_f/.lhe.gz/}
@@ -21,6 +22,8 @@ rm -rf *
 mkdir -p Configuration/GenProduction/python/
 cp ${BASEDIR}/conf/${HADRONIZER} Configuration/GenProduction/python/
 zcat ${MGLHEDIR}/$1 > ${LHE_f/.gz/}
+echo "    Replace lifetime for LHE.."
+python ${BASEDIR}/replaceLHELifetime.py -i ${LHE_f/.gz/} -t ${CTau_mm}
 eval `scram runtime -sh`
 scram b -j 4
 
