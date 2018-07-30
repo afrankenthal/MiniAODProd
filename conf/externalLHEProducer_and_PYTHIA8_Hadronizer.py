@@ -1,7 +1,8 @@
 import FWCore.ParameterSet.Config as cms
 
 from Configuration.Generator.Pythia8CommonSettings_cfi import *
-from Configuration.Generator.MCTunes2017.PythiaCP5Settings_cfi import *
+#from Configuration.Generator.MCTunes2017.PythiaCP5Settings_cfi import *
+from Configuration.Generator.Pythia8CUEP8M1Settings_cfi import *
 
 # Avoid to have multiple lumi in the same job and therefore auto-cleaning
 # This means that it need an argument to be run
@@ -34,23 +35,27 @@ generator = cms.EDFilter("Pythia8HadronizerFilter",
     comEnergy = cms.double(13000.),
     PythiaParameters = cms.PSet(
         pythia8CommonSettingsBlock,
-        pythia8CP5SettingsBlock,
-        #processParameters = cms.vstring(
-        #    'JetMatching:setMad = off',
-        #    'JetMatching:scheme = 1',
-        #    'JetMatching:merge = on',
-        #    'JetMatching:jetAlgorithm = 2',
-        #    'JetMatching:etaJetMax = 5.',
-        #    'JetMatching:coneRadius = 1.',
-        #    'JetMatching:slowJetPower = 1',
-        #    'JetMatching:qCut = 19.', #this is the actual merging scale
-        #    'JetMatching:nQmatch = 5', #5 for 5-flavour scheme (matching of b-quarks)
-        #    'JetMatching:nJetMax = 1', #number of partons in born matrix element for highest multiplicity
-        #    'JetMatching:doShowerKt = off', #off for MLM matching, turn on for shower-kT matching
-        #),
+        pythia8CUEP8M1SettingsBlock,
+        processParameters = cms.vstring(
+            'JetMatching:setMad = off',
+            'JetMatching:scheme = 1',
+            'JetMatching:merge = on',
+            'JetMatching:jetAlgorithm = 2',
+            'JetMatching:etaJetMax = 5.',
+            'JetMatching:coneRadius = 1.',
+            'JetMatching:slowJetPower = 1',
+            'JetMatching:qCut = 30', #this is the actual merging scale
+            'JetMatching:nQmatch = 4', #4 for 4-flavour scheme (no matching of b-quarks)
+            'JetMatching:nJetMax = 1', #number of partons in born matrix element for highest multiplicity
+            'JetMatching:doShowerKt = off', #off for MLM matching, turn on for shower-kT matching
+						'Check:epTolErr = 0.0003',
+            '9100000:new  = MED MED 3 0 0 X_MMed_X 0 0 0 99999',
+            '9100022:new  = DM  DM  2 0 0 X_MFM_X  0 0 0 99999',
+            '9100022:mayDecay = off'
+        ),
         parameterSets = cms.vstring('pythia8CommonSettings',
-                                    'pythia8CP5Settings',
-                                    #'processParameters',
+                                    'pythia8CUEP8M1Settings',
+                                    'processParameters',
                                     )
     )
 )

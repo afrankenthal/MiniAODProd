@@ -71,7 +71,7 @@ exit 0'''
         # e.g. SIDMmumu_Mps-200_MZp-1p2_ctau-0p1.tar.xz
         # e.g. SIDMmumu_Mps-202_MZp-1p2_ctau-0p01.lhe.gz
         ctau = '0'
-        if 'SIDM' in infile:
+        if 'iDM' in infile:
             nameTags = infile.split('.')[0].split('_')
             for t in nameTags:
                 if 'ctau' in t:
