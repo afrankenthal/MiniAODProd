@@ -8,22 +8,22 @@ CTau_mm=$2
 MGLHEDIR=${BASEDIR}/mgLHEs
 HADRONIZER="externalLHEProducer_and_PYTHIA8_Hadronizer.py"
 namebase=${LHE_f/.lhe.gz/}
-nevent=1000
+nevent=10000
 
 export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch
 source $VO_CMS_SW_DIR/cmsset_default.sh
 
 export SCRAM_ARCH=slc6_amd64_gcc630
-if ! [ -r CMSSW_9_4_4/src ] ; then
-    scram p CMSSW CMSSW_9_4_4
+if ! [ -r CMSSW_9_4_9/src ] ; then
+    scram p CMSSW CMSSW_9_4_9
 fi
-cd CMSSW_9_4_4/src
+cd CMSSW_9_4_9/src
 rm -rf *
 mkdir -p Configuration/GenProduction/python/
 cp ${BASEDIR}/conf/${HADRONIZER} Configuration/GenProduction/python/
 zcat ${MGLHEDIR}/$1 > ${LHE_f/.gz/}
-echo "    Replace lifetime for LHE.."
-python ${BASEDIR}/replaceLHELifetime.py -i ${LHE_f/.gz/} -t ${CTau_mm}
+#echo "    Replace lifetime for LHE.."
+#python ${BASEDIR}/replaceLHELifetime.py -i ${LHE_f/.gz/} -t ${CTau_mm}
 eval `scram runtime -sh`
 scram b -j 4
 
@@ -42,8 +42,8 @@ echo "2.) Generating DIGI-RAW-HLT"
 cmsDriver.py step1 \
     --filein file:${namebase}_GENSIM.root \
     --fileout file:${namebase}_DIGIRAWHLT.root \
-    --era Run2_2017 --conditions 94X_mc2017_realistic_v10 \
-    --mc --step DIGI,L1,DIGI2RAW,HLT:@relval2017 \
+    --era Run2_2017 --conditions 94X_mc2017_realistic_v12 \
+    --mc --step DIGI,L1,DIGI2RAW,HLT:2e34v40 \
     --datatier GEN-SIM-DIGI-RAWHLTDEBUG --eventcontent FEVTDEBUGHLT \
     --number ${nevent} \
     --geometry DB:Extended --nThreads 8 \

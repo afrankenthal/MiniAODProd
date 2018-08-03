@@ -10,7 +10,7 @@ def buildSubmit(infile, workpath, mode, uid, user):
     '''A series of actions to prepare submit dir'''
 
     stageOutPiece = '''
-remoteDIR="/store/user/%s/standaloneComp/iDM"
+remoteDIR="/store/user/%s/iDM/Samples"
 for f in `ls *AOD*.root`; do
     cmd="xrdcp -vf file:///$PWD/$f root://cmseos.fnal.gov/$remoteDIR/$f"
     echo $cmd && eval $cmd
