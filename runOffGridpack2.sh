@@ -1,18 +1,53 @@
 #! /bin/bash
 
-## Usage: ./runOffLHE.sh SIDMmumu_Mps-202_MZp-1p2_ctau-0p01.lhe.gz 0.1
+## Usage: ./runOffGridpack.sh SIDMmumu_Mps-200_MZp-1p2_ctau-0p1.tar.xz 1
 
 export BASEDIR=`pwd`
-LHE_f=$(basename -- $1)
+GP_f=$1
 CTau_mm=$2
-MGLHEDIR=${BASEDIR}/mgLHEs
+GRIDPACKDIR=${BASEDIR}/gridpacks
+LHEDIR=${BASEDIR}/mylhes
+SAMPLEDIR=${BASEDIR}/samples
+[ -d ${LHEDIR} ] || mkdir ${LHEDIR}
+
 HADRONIZER="externalLHEProducer_and_PYTHIA8_Hadronizer.py"
-namebase=${LHE_f/.lhe.gz/}
-#nevent=10000
-nevent=-1
+namebase=${GP_f/.tar.xz/}
+#nevent=2
+nevent=1000
 
 export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch
 source $VO_CMS_SW_DIR/cmsset_default.sh
+
+export SCRAM_ARCH=slc6_amd64_gcc481
+if ! [ -r CMSSW_9_4_9/src ] ; then
+    scram p CMSSW CMSSW_9_4_9
+fi
+cd CMSSW_9_4_9/src
+eval `scram runtime -sh`
+scram b -j 4
+tar xaf ${GRIDPACKDIR}/${GP_f}
+sed -i 's/exit 0//g' runcmsgrid.sh
+ls -lrth
+
+RANDOMSEED=`od -vAn -N4 -tu4 < /dev/urandom`
+#Sometimes the RANDOMSEED is too long for madgraph
+RANDOMSEED=`echo $RANDOMSEED | rev | cut -c 3- | rev`
+
+echo "0.) Generating LHE"
+sh runcmsgrid.sh ${nevent} ${RANDOMSEED} 4
+namebase=${namebase}_$RANDOMSEED
+#for CTau_mm in 10 100 1000 10000
+#do
+	#namebase1=${namebase}_ctau-${CTau_mm}
+	echo "    Replace lifetime for LHE.. ${CTau_mm}"
+	python ${BASEDIR}/replaceLHELifetime.py -i cmsgrid_final.lhe -t ${CTau_mm}
+	cp cmsgrid_final.lhe ${LHEDIR}/${namebase}.lhe
+	echo "${LHEDIR}/${namebase}.lhe" 
+	allpacks+=("${namebase}")
+#done
+rm -rf *
+cd ${BASEDIR}
+echo ${allpacks[@]}
 
 export SCRAM_ARCH=slc6_amd64_gcc630
 if ! [ -r CMSSW_9_4_9/src ] ; then
@@ -22,22 +57,36 @@ cd CMSSW_9_4_9/src
 rm -rf *
 mkdir -p Configuration/GenProduction/python/
 cp ${BASEDIR}/conf/${HADRONIZER} Configuration/GenProduction/python/
-zcat ${MGLHEDIR}/$1 > ${LHE_f/.gz/}
-#echo "    Replace lifetime for LHE.."
-#python ${BASEDIR}/replaceLHELifetime.py -i ${LHE_f/.gz/} -t ${CTau_mm}
 eval `scram runtime -sh`
 scram b -j 4
-
+#for namebase in ${allpacks[@]}
+#do
+echo "${namebase}"
 echo "1.) Generating GEN-SIM"
+genfragment=${namebase}_GENSIM_cfg.py
 cmsDriver.py Configuration/GenProduction/python/${HADRONIZER} \
-    --filein file:${LHE_f/.gz/} \
+    --filein file:${LHEDIR}/${namebase}.lhe \
     --fileout file:${namebase}_GENSIM.root \
     --mc --eventcontent RAWSIM --datatier GEN-SIM \
     --conditions auto:phase1_2017_realistic --beamspot Realistic25ns13TeVEarly2017Collision \
-    --step GEN,SIM --era Run2_2017 \
+    --step GEN,SIM --era Run2_2017 --nThreads 8 \
     --customise Configuration/DataProcessing/Utils.addMonitoring \
-    --python_filename ${namebase}_GENSIM_cfg.py --no_exec -n ${nevent} || exit $?;
-cmsRun -p ${namebase}_GENSIM_cfg.py
+    --python_filename ${genfragment} --no_exec -n ${nevent} || exit $?;
+
+#Make each file unique to make later publication possible
+linenumber=`grep -n 'process.source' ${genfragment} | awk '{print $1}'`
+linenumber=${linenumber%:*}
+total_linenumber=`cat ${genfragment} | wc -l`
+bottom_linenumber=$((total_linenumber - $linenumber ))
+tail -n $bottom_linenumber ${genfragment} > tail.py
+head -n $linenumber ${genfragment} > head.py
+echo "    firstRun = cms.untracked.uint32(1)," >> head.py
+echo "    firstLuminosityBlock = cms.untracked.uint32($RANDOMSEED)," >> head.py
+cat tail.py >> head.py
+mv head.py ${genfragment}
+rm -rf tail.py
+
+cmsRun -p ${genfragment}
 
 echo "2.) Generating DIGI-RAW-HLT"
 cmsDriver.py step1 \
@@ -73,4 +122,10 @@ cmsDriver.py step3 \
     --customise Configuration/DataProcessing/Utils.addMonitoring -n ${nevent} || exit $?;
 cmsRun -p ${namebase}_MINIAOD_cfg.py
 
+pwd
+cmd="ls -arlth *.root"
+echo $cmd && eval $cmd
+
 echo "DONE."
+#done
+echo "ALL Done"

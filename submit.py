@@ -30,8 +30,8 @@ done''' % user
             os.makedirs(workpath+'/submit/gridpacks')
             os.system('cp gridpacks/%s %s/submit/gridpacks' % (infile, workpath))
             os.system('cp replaceLHELifetime.py %s/submit' % workpath)
-            os.system('cp runOffGridpack.sh %s/submit' % workpath)
-            with open('%s/submit/runOffGridpack.sh' % workpath, 'a') as f:
+            os.system('cp runOffGridpack2.sh %s/submit' % workpath)
+            with open('%s/submit/runOffGridpack2.sh' % workpath, 'a') as f:
                 f.write(stageOutPiece)
     except:
         print "%s probably not exist." % infile
@@ -76,12 +76,12 @@ exit 0'''
             for t in nameTags:
                 if 'ctau' in t:
                     ctau = t.split('-', 1)[-1]
-                    ctau = str( float(ctau.replace('p','.'))*10 )
+                    ctau = str( float(ctau.replace('p','.')))# [ANDRE]in mm already *10 )
 
         if mode == 'lhe':
             f.write(execF % ('runOffLHE', infile+' '+ctau))
         else:
-            f.write(execF % ('runOffGridpack', infile+' '+ctau))
+            f.write(execF % ('runOffGridpack2', infile+' '+ctau))
 
 
 
@@ -122,7 +122,8 @@ if __name__ == "__main__":
 
     inf = sys.argv[1]
     Mode = 'lhe' if 'lhe' in inf else 'gridpack'
-    Process = inf.split('.')[0]
+    Process = inf.split('/')[-1].split('.')[0]
+    print Process
 
     Njobs = 1 if len(sys.argv) == 2 else sys.argv[2]
 

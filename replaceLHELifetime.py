@@ -11,7 +11,7 @@ import os
 parser = argparse.ArgumentParser()
 parser.add_argument('-i', '--input', type=str, required=True, help='Input LHE, which is to be replaced')
 parser.add_argument('-t', '--ctau', type=float, required=True, help='Mean proper decay length[mm]')
-parser.add_argument('-p', '--pid', type=int, default=32, help='Particle whose lifetime is going to be replaced')
+parser.add_argument('-p', '--pid', type=int, default=1000023, help='Particle whose lifetime is going to be replaced')
 args = parser.parse_args()
 
 inFn = args.input

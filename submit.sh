@@ -10,4 +10,5 @@ voms-proxy-init -voms cms -valid 192:00
 #./submit.py SIDMmumu_Mps-200_MZp-1p2_ctau-3p6.tar.xz      10
 
 #./submit.py SIDM-SIDMmumu_Mps-202_MZp-1p2_ctau-0p01.lhe.gz 1
-./submit.py iDM-iDM_Mchi-5p25_dMchi-0p5_mZDinput-15p0.lhe.gz 10
+./submit.py iDM_Mchi-6p0_dMchi-2p0_mZDinput-15p0_ctau-1p0.tar.xz 400
+#./submit.py iDM_Mchi-5p25_dMchi-0p5_mZDinput-15p0_ctau-1p0.tar.xz 400 
