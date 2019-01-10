@@ -3,10 +3,10 @@
 import os, sys
 import getpass
 
-'''Usage: ./submit.py <LHE/gridpack filename> [njobs]
+'''Usage: ./submit.py <LHE/gridpack filename> year [njobs]
 '''
 
-def buildSubmit(infile, workpath, mode, uid, user):
+def buildSubmit(infile, workpath, mode, uid, user, year):
     '''A series of actions to prepare submit dir'''
 
     stageOutPiece = '''
@@ -28,10 +28,10 @@ done''' % user
                 f.write(stageOutPiece)
         else:
             os.makedirs(workpath+'/submit/gridpacks')
-            os.system('cp gridpacks/%s %s/submit/gridpacks' % (infile, workpath))
+            os.system('cp gridpacks/UpdatedModel_OnlyMuons/%s %s/submit/gridpacks' % (infile, workpath))
             os.system('cp replaceLHELifetime.py %s/submit' % workpath)
-            os.system('cp runOffGridpack2.sh %s/submit' % workpath)
-            with open('%s/submit/runOffGridpack2.sh' % workpath, 'a') as f:
+            os.system('cp runOffGridpack%s.sh %s/submit' % (year,workpath))
+            with open('%s/submit/runOffGridpack%s.sh' % (workpath,year), 'a') as f:
                 f.write(stageOutPiece)
     except:
         print "%s probably not exist." % infile
@@ -50,7 +50,7 @@ done''' % user
 
 
 
-def buildExec(infile, workpath, mode):
+def buildExec(infile, workpath, mode, year):
     '''Given the workpath, write a exec.sh in it, to be used by condor'''
 
     execF = '''
@@ -81,7 +81,7 @@ exit 0'''
         if mode == 'lhe':
             f.write(execF % ('runOffLHE', infile+' '+ctau))
         else:
-            f.write(execF % ('runOffGridpack2', infile+' '+ctau))
+            f.write(execF % (('runOffGridpack%s' % year), infile+' '+ctau))
 
 
 
@@ -105,7 +105,7 @@ arguments = $(Process)
 use_x509userproxy = True
 x509userproxy = /tmp/x509up_u{2}
 #on_exit_hold = (ExitBySignal == True) || (ExitCode != 0)
-notify_user = {3}@FNAL.GOV
+notify_user = {3}@cornell.edu
 +AccountingGroup = "analysis.{3}"
 +AcctGroup = "analysis"
 +ProjectName = "DarkMatterSimulation"
@@ -125,7 +125,18 @@ if __name__ == "__main__":
     Process = inf.split('/')[-1].split('.')[0]
     print Process
 
-    Njobs = 1 if len(sys.argv) == 2 else sys.argv[2]
+    if len(sys.argv) < 3:
+        print "ERROR! Need at least 2 arguments!"
+        print "Usage: ./submit.py <LHE/gridpack filename> year [njobs]"
+        sys.exit()
+    elif sys.argv[2] != '2017' and sys.argv[2] != '2018':
+        print "ERROR! Mandatory argument is year!"
+        print "Usage: ./submit.py <LHE/gridpack filename> year [njobs]"
+        sys.exit()
+        
+    year = sys.argv[2]
+
+    Njobs = 1 if len(sys.argv) < 4 else sys.argv[3]
 
     Logpath = os.getcwd() + '/Logs'
     if not os.path.isdir(Logpath): os.mkdir(Logpath)
@@ -135,8 +146,8 @@ if __name__ == "__main__":
     Uid = os.getuid()
     User = getpass.getuser()
 
-    buildSubmit(infile=inf, workpath=Workpath, mode=Mode, uid=Uid, user=User)
-    buildExec(infile=inf, workpath=Workpath, mode=Mode)
+    buildSubmit(infile=inf, workpath=Workpath, mode=Mode, uid=Uid, user=User, year=year)
+    buildExec(infile=inf, workpath=Workpath, mode=Mode, year=year)
     theCondor = buildCondor(process=Process, workpath=Workpath,
             logpath=Logpath, uid=Uid, user=User, njobs=Njobs)
     os.system('condor_submit %s' % theCondor)
