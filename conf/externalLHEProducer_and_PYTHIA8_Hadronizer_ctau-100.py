@@ -60,9 +60,9 @@ generator = cms.EDFilter("Pythia8HadronizerFilter",
                 'JetMatching:etaJetMax = 5.',
                 'JetMatching:coneRadius = 1.',
                 'JetMatching:slowJetPower = 1',
-                'JetMatching:qCut = 30', #this is the actual merging scale
+                'JetMatching:qCut = 25', #this is the actual merging scale
                 'JetMatching:nQmatch = 4', #5 for 5-flavour scheme (matching of b-quarks)
-                'JetMatching:nJetMax = 1', #number of partons in born matrix element for highest multiplicity
+                'JetMatching:nJetMax = 2', #number of partons in born matrix element for highest multiplicity
                 'JetMatching:doShowerKt = off', #off for MLM matching, turn on for shower-kT matching
                 ),
             processParameters = cms.vstring(
@@ -168,7 +168,7 @@ tmpAk4GenJetsNoNu = cms.EDProducer("FastjetJetProducer",
 
 genHTFilter = cms.EDFilter("GenHTFilter",
         src = cms.InputTag("tmpAk4GenJetsNoNu"), #GenJet collection as input
-        jetPtCut = cms.double(30.0), #GenJet pT cut for HT
+        jetPtCut = cms.double(80.0), #GenJet pT cut for HT
         jetEtaCut = cms.double(5.0), #GenJet eta cut for HT
         genHTcut = cms.double(80.0) #genHT cut
         )
