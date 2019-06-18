@@ -28,7 +28,7 @@ done''' % user
                 f.write(stageOutPiece)
         else:
             os.makedirs(workpath+'/submit/gridpacks')
-            os.system('cp gridpacks/UpdatedModel_OnlyMuons/%s %s/submit/gridpacks' % (infile, workpath))
+            os.system('cp gridpacks/Production/%s %s/submit/gridpacks' % (infile, workpath))
             os.system('cp replaceLHELifetime.py %s/submit' % workpath)
             os.system('cp runOffGridpack%s.sh %s/submit' % (year,workpath))
             with open('%s/submit/runOffGridpack%s.sh' % (workpath,year), 'a') as f:
@@ -42,7 +42,7 @@ done''' % user
         raise
 
 
-    os.system('cp /tmp/x509up_u%d %s/x509up' % (uid, workpath))
+    #os.system('cp /tmp/x509up_u%d %s/x509up' % (uid, workpath))
     print "Tarring up submit..."
     os.chdir(workpath)
     os.system('tar -chzf submit.tgz submit')
@@ -53,10 +53,8 @@ done''' % user
 def buildExec(infile, workpath, mode, year):
     '''Given the workpath, write a exec.sh in it, to be used by condor'''
 
-    execF = '''
-#!/bin/bash
+    execF = '''#!/bin/bash
 
-export X509_USER_PROXY=${PWD}/x509up
 export HOME=${PWD}
 
 tar xvaf submit.tgz
@@ -88,12 +86,11 @@ exit 0'''
 def buildCondor(process, workpath, logpath, uid, user, njobs=1):
     '''build the condor file, return the abs path'''
 
-    condorF = '''
-universe = vanilla
+    condorF = '''universe = vanilla
 executable = {0}/exec.sh
 should_transfer_files = YES
 when_to_transfer_output = ON_EXIT
-transfer_input_files = {0}/submit.tgz,{0}/x509up
+transfer_input_files = {0}/submit.tgz
 transfer_output_files = ""
 input = /dev/null
 output = {1}/$(Cluster)_$(Process).out
@@ -102,14 +99,12 @@ log = {1}/$(Cluster)_$(Process).log
 rank = Mips
 request_memory = 8000
 arguments = $(Process)
-use_x509userproxy = True
-x509userproxy = /tmp/x509up_u{2}
 #on_exit_hold = (ExitBySignal == True) || (ExitCode != 0)
-notify_user = {3}@cornell.edu
-+AccountingGroup = "analysis.{3}"
+notify_user = {2}@cornell.edu
++AccountingGroup = "analysis.{2}"
 +AcctGroup = "analysis"
 +ProjectName = "DarkMatterSimulation"
-queue {4}'''.format(workpath, logpath, uid, user, njobs)
+queue {3}'''.format(workpath, logpath, user, njobs)
     condorFN = 'condor_%s.jdl' % process
 
     with open(logpath + '/' + condorFN, 'w') as jdlfile:
@@ -130,7 +125,7 @@ if __name__ == "__main__":
         print "Usage: ./submit.py <LHE/gridpack filename> year [njobs]"
         sys.exit()
     elif sys.argv[2] != '2017' and sys.argv[2] != '2018':
-        print "ERROR! Mandatory argument is year!"
+        print "ERROR! Year (2017/18) is a mandatory argument!"
         print "Usage: ./submit.py <LHE/gridpack filename> year [njobs]"
         sys.exit()
         
@@ -140,7 +135,7 @@ if __name__ == "__main__":
 
     Logpath = os.getcwd() + '/Logs'
     if not os.path.isdir(Logpath): os.mkdir(Logpath)
-    Workpath = os.getcwd() + '/submit_' + Process
+    Workpath = os.getcwd() + '/submissions' + '/submit_' + Process
     if os.path.isdir(Workpath): os.system('rm -rf %s' % Workpath)
     os.mkdir(Workpath)
     Uid = os.getuid()

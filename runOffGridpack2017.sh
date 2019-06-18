@@ -20,11 +20,10 @@
 ##
 ## Currently MINIAOD production is commented out to save time.
 
-## Usage: ./runOffGridpack.sh SIDMmumu_Mps-200_MZp-1p2_ctau-0p1.tar.xz 1
+## Usage: ./runOffGridpack.sh SIDMmumu_Mps-200_MZp-1p2_ctau-0p1.tar.xz
 
 export BASEDIR=`pwd`
 GP_f=$1
-CTau_mm=$2
 GRIDPACKDIR=${BASEDIR}/gridpacks
 LHEDIR=${BASEDIR}/mylhes
 SAMPLEDIR=${BASEDIR}/samples
@@ -55,9 +54,6 @@ RANDOMSEED=`echo $RANDOMSEED | rev | cut -c 3- | rev`
 echo "0.) Generating LHE"
 sh runcmsgrid.sh ${nevent} ${RANDOMSEED} 4
 namebase=${namebase}_$RANDOMSEED
-# Don't need to replace lifetime in LHE file anymore
-# echo "    Replace lifetime for LHE.. ${CTau_mm}"
-# python ${BASEDIR}/replaceLHELifetime.py -i cmsgrid_final.lhe -t ${CTau_mm}
 cp cmsgrid_final.lhe ${LHEDIR}/${namebase}.lhe
 echo "${LHEDIR}/${namebase}.lhe" 
 rm -rf *

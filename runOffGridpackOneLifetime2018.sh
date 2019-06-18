@@ -14,7 +14,7 @@ LHEDIR=${BASEDIR}/mylhes
 SAMPLEDIR=${BASEDIR}/samples
 [ -d ${LHEDIR} ] || mkdir ${LHEDIR}
 
-HADRONIZER="externalLHEProducer_and_PYTHIA8_Hadronizer.py"
+HADRONIZER="externalLHEProducer_and_PYTHIA8_Hadronizer_${CTau_mm}.py"
 namebase=${GP_f/.tar.xz/}
 nevent=1000
 
@@ -39,6 +39,7 @@ RANDOMSEED=`echo $RANDOMSEED | rev | cut -c 3- | rev`
 echo "0.) Generating LHE"
 sh runcmsgrid.sh ${nevent} ${RANDOMSEED} 4
 namebase=${namebase}_$RANDOMSEED
+# Don't need this anymore, lifetime replacement happens in Pythia (hadronizer)
 # echo "    Replace lifetime for LHE.. ${CTau_mm}"
 # python ${BASEDIR}/replaceLHELifetime.py -i cmsgrid_final.lhe -t ${CTau_mm}
 cp cmsgrid_final.lhe ${LHEDIR}/${namebase}.lhe
