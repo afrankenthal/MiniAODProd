@@ -31,7 +31,7 @@ done''' % user
             os.system('cp gridpacks/Production/%s %s/submit/gridpacks' % (infile, workpath))
             os.system('cp replaceLHELifetime.py %s/submit' % workpath)
             os.system('cp runOffGridpack%sPileupCondor.sh %s/submit' % (year,workpath))
-            os.system('cp DIGIRAWHLT_template.py %s/submit' % workpath)
+            os.system('cp DIGIRAWHLT_template_%s.py %s/submit' % (year,workpath))
             with open('%s/submit/runOffGridpack%sPileupCondor.sh' % (workpath,year), 'a') as f:
                 f.write(stageOutPiece)
     except:
@@ -125,8 +125,8 @@ if __name__ == "__main__":
         print "ERROR! Need at least 2 arguments!"
         print "Usage: ./submit.py <LHE/gridpack filename> year [njobs]"
         sys.exit()
-    elif sys.argv[2] != '2017' and sys.argv[2] != '2018':
-        print "ERROR! Year (2017/18) is a mandatory argument!"
+    elif sys.argv[2] not in ['2016', '2017', '2018']: 
+        print "ERROR! Year (2016/17/18) is a mandatory argument!"
         print "Usage: ./submit.py <LHE/gridpack filename> year [njobs]"
         sys.exit()
         

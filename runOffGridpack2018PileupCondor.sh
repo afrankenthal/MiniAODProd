@@ -31,7 +31,7 @@ SAMPLEDIR=${BASEDIR}/samples
 
 HADRONIZER="externalLHEProducer_and_PYTHIA8_Hadronizer"
 namebase=${GP_f/.tar.xz/}
-nevent=250
+nevent=1000
 
 export VO_CMS_SW_DIR=/cvmfs/cms.cern.ch
 source $VO_CMS_SW_DIR/cmsset_default.sh
